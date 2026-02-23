@@ -14,6 +14,12 @@ import { useEditorStore } from '@/store/use-editor-store'
 import { FontFamily, TextStyleKit, Color } from '@tiptap/extension-text-style'
 import { Highlight } from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
+import TextAlign from '@tiptap/extension-text-align'
+
+//custom extension
+import { FontSizeExtension } from '@/extension/font-size';
+import { LineHeightExtension } from '@/extension/line-height'
+
 
 
 export const Editor = () => {
@@ -44,6 +50,12 @@ export const Editor = () => {
     },
 
     extensions: [
+      StarterKit,
+      LineHeightExtension,
+      FontSizeExtension,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -103,7 +115,7 @@ export const Editor = () => {
           }
         },
       }),
-      StarterKit,
+
       Highlight.configure({
         multicolor: true
       }),
