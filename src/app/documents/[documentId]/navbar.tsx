@@ -15,11 +15,48 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 
-import { FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIcon, GlobeIcon, PrinterIcon, TrashIcon, Undo2Icon, TextIcon, BoldIcon, UnderlineIcon, ItalicIcon, StrikethroughIcon, RemoveFormattingIcon } from "lucide-react";
+import { FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIcon, GlobeIcon, PrinterIcon, TrashIcon, Undo2Icon, TextIcon, BoldIcon, UnderlineIcon, ItalicIcon, StrikethroughIcon, RemoveFormattingIcon, Redo2Icon } from "lucide-react";
 import { BsFilePdf } from "react-icons/bs";
+import { useEditorStore } from "@/store/use-editor-store";
 
 
 export const Navbar = () => {
+
+  const { editor } = useEditorStore()
+
+
+
+  const onDownload = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url;
+    a.download = fileName
+    a.click()
+  }
+
+  const onSaveJson = () => {
+    if (!editor) return
+
+    const content = editor.getJSON();
+    const blob = new Blob([JSON.stringify(content)], {
+      type: "application/json"
+    })
+
+    onDownload(blob, `document.json`)
+  }
+
+
+  const onSaveText = () => {
+    if (!editor) return
+
+    const content = editor.getText();
+    const blob = new Blob([content], {
+      type: "text/plain"
+    })
+
+    onDownload(blob, `document.txt`)
+  }
+
   return (
     <div>
       <div className="flex gap-2 items-center">
@@ -45,19 +82,15 @@ export const Navbar = () => {
                       Save
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveJson}>
                         <FileJsonIcon className="size-4 mr-2" />
                         JSON
                       </MenubarItem>
-                      <MenubarItem>
-                        <GlobeIcon className="size-4 mr-2" />
-                        HTML
-                      </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => window.print()}>
                         <BsFilePdf className="size-4 mr-2" />
                         PDF
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveText}>
                         <FileTextIcon className="size-4 mr-2" />
                         Text
                       </MenubarItem>
@@ -91,9 +124,13 @@ export const Navbar = () => {
                   Edit
                 </MenubarTrigger>
                 <MenubarContent>
-                  <MenubarItem>
+                  <MenubarItem onClick={() => editor?.chain().focus().undo().run()}>
                     <Undo2Icon className="size-4 mr-2" />
                     Undo
+                  </MenubarItem>
+                  <MenubarItem onClick={() => editor?.chain().focus().redo().run()}>
+                    <Redo2Icon className="size-4 mr-2" />
+                    Redo
                   </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
